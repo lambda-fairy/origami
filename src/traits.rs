@@ -40,8 +40,8 @@ impl Semigroup for String {
 }
 
 impl<T> Semigroup for Vec<T> {
-    fn combine(mut self, other: Vec<T>) -> Vec<T> {
-        self.extend(other.into_iter());
+    fn combine(mut self, mut other: Vec<T>) -> Vec<T> {
+        self.append(&mut other);
         self
     }
 }
