@@ -19,6 +19,30 @@ pub trait Semigroup {
     fn combine(self, other: Self) -> Self;
 }
 
+impl Semigroup for () {
+    fn combine(self, _other: ()) -> () {
+        ()
+    }
+}
+
+impl<A: Semigroup> Semigroup for (A,) {
+    fn combine(self, other: (A,)) -> (A,) {
+        (self.0.combine(other.0),)
+    }
+}
+
+impl<A: Semigroup, B: Semigroup> Semigroup for (A, B) {
+    fn combine(self, other: (A, B)) -> (A, B) {
+        (self.0.combine(other.0), self.1.combine(other.1))
+    }
+}
+
+impl<A: Semigroup, B: Semigroup, C: Semigroup> Semigroup for (A, B, C) {
+    fn combine(self, other: (A, B, C)) -> (A, B, C) {
+        (self.0.combine(other.0), self.1.combine(other.1), self.2.combine(other.2))
+    }
+}
+
 /// Combine the underlying `Some` values, ignoring `None`s.
 impl<T: Semigroup> Semigroup for Option<T> {
     fn combine(self, other: Option<T>) -> Option<T> {
@@ -60,6 +84,30 @@ impl<T> Semigroup for Vec<T> {
 pub trait Monoid: Semigroup {
     /// Return the unit value.
     fn unit() -> Self;
+}
+
+impl Monoid for () {
+    fn unit() -> () {
+        ()
+    }
+}
+
+impl<A: Monoid> Monoid for (A,) {
+    fn unit() -> (A,) {
+        (Monoid::unit(),)
+    }
+}
+
+impl<A: Monoid, B: Monoid> Monoid for (A, B) {
+    fn unit() -> (A, B) {
+        (Monoid::unit(), Monoid::unit())
+    }
+}
+
+impl<A: Monoid, B: Monoid, C: Monoid> Monoid for (A, B, C) {
+    fn unit() -> (A, B, C) {
+        (Monoid::unit(), Monoid::unit(), Monoid::unit())
+    }
 }
 
 /// The unit of `Option<T>` is `None`.
