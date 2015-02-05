@@ -106,7 +106,7 @@ impl<T> Monoid for Vec<T> {
 /// ```
 ///
 /// Instead of repeatedly allocating `String`s, the `Reducer` creates a
-/// single `String` and pushes every element to it.
+/// single `String` and pushes to it using `.combine_right()`.
 pub trait Reducer<T>: Semigroup + Sized {
     fn unit(value: T) -> Self;
     fn combine_left(self, value: T) -> Self {
