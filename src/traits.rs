@@ -138,14 +138,3 @@ impl<'a, T: Clone> Reducer<&'a [T]> for Vec<T> {
         self
     }
 }
-
-/// Trait for wrapper types.
-///
-/// A wrapper type ("newtype") is a struct with a single field.
-pub trait Wrapper {
-    type Inner;
-    /// Wrap a value.
-    fn from_inner(value: Self::Inner) -> Self;
-    /// Unwrap a value.
-    fn into_inner(self) -> Self::Inner;
-}

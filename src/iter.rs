@@ -12,7 +12,6 @@ pub trait IteratorFoldExt: Iterator + Sized {
     ///
     /// ```rust
     /// # use origami::iter::IteratorFoldExt;
-    /// # use origami::traits::Wrapper;
     /// # use origami::wrappers::Sum;
     /// let nums = vec![Sum(1), Sum(2), Sum(3)];
     /// let sum = nums.into_iter().fold_monoid();
@@ -32,7 +31,6 @@ pub trait IteratorFoldExt: Iterator + Sized {
     ///
     /// ```rust
     /// # use origami::iter::IteratorFoldExt;
-    /// # use origami::traits::Wrapper;
     /// # use origami::wrappers::Product;
     /// let nums = vec![Product(1), Product(2), Product(3)];
     /// let product = nums.into_iter().fold_nonempty();
@@ -53,10 +51,9 @@ pub trait IteratorFoldExt: Iterator + Sized {
     ///
     /// ```rust
     /// # use origami::iter::IteratorFoldExt;
-    /// # use origami::traits::Wrapper;
     /// # use origami::wrappers::All;
     /// let nums = vec![true, false, true];
-    /// let all_true = nums.into_iter().fold_map(All).into_inner();
+    /// let all_true = nums.into_iter().fold_map(All).0;
     /// assert_eq!(all_true, false);
     /// ```
     fn fold_map<F, A>(self, f: F) -> A
@@ -104,12 +101,6 @@ pub trait IteratorFoldExt: Iterator + Sized {
             Some(first) => Some(self.fold(Reducer::unit(first), Reducer::combine_right)),
         }
     }
-
-/*
-    // Blocked by <https://github.com/rust-lang/rust/issues/20041>
-    fn fold_with<F, W>(self, wrapper: F) -> Self::Item
-        where Self::Item: Monoid, F: Fn(Self::Item) -> W, W: Wrapper, <W as Wrapper>::Inner = Self::Item;
-*/
 }
 
 impl<I> IteratorFoldExt for I where I: Iterator + Sized {}
