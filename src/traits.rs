@@ -117,6 +117,24 @@ pub trait Reducer<T>: Semigroup + Sized {
     }
 }
 
+impl<T, R: Reducer<T>> Reducer<T> for Option<R> {
+    fn unit(value: T) -> Option<R> {
+        Some(Reducer::unit(value))
+    }
+    fn combine_left(self, value: T) -> Option<R> {
+        match self {
+            None => Some(Reducer::unit(value)),
+            Some(r) => Some(r.combine_left(value)),
+        }
+    }
+    fn combine_right(self, value: T) -> Option<R> {
+        match self {
+            None => Some(Reducer::unit(value)),
+            Some(r) => Some(r.combine_right(value)),
+        }
+    }
+}
+
 impl<'a> Reducer<&'a str> for String {
     fn unit(value: &str) -> String {
         String::from_str(value)
