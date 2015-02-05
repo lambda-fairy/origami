@@ -1,5 +1,6 @@
 //! Various wrapper types.
 
+use std::cmp;
 use num::{One, Zero};
 use std::ops::{Add, Mul};
 
@@ -55,4 +56,40 @@ impl Semigroup for Any {
 
 impl Monoid for Any {
     fn unit() -> Any { Any(false) }
+}
+
+#[derive(Copy, Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub struct Min<T>(pub T);
+
+impl<T: Ord> Semigroup for Min<T> {
+    fn combine(self, other: Min<T>) -> Min<T> {
+        Min(cmp::min(self.0, other.0))
+    }
+}
+
+#[derive(Copy, Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub struct Max<T>(pub T);
+
+impl<T: Ord> Semigroup for Max<T> {
+    fn combine(self, other: Max<T>) -> Max<T> {
+        Max(cmp::max(self.0, other.0))
+    }
+}
+
+#[derive(Copy, Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub struct First<T>(pub T);
+
+impl<T: Ord> Semigroup for First<T> {
+    fn combine(self, _other: First<T>) -> First<T> {
+        self
+    }
+}
+
+#[derive(Copy, Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub struct Last<T>(pub T);
+
+impl<T: Ord> Semigroup for Last<T> {
+    fn combine(self, other: Last<T>) -> Last<T> {
+        other
+    }
 }
