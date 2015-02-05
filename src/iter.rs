@@ -23,28 +23,6 @@ pub trait IteratorFoldExt: Iterator + Sized {
         self.fold(Monoid::unit(), Semigroup::combine)
     }
 
-    /// Fold a non-empty iterator using the combining operation.
-    ///
-    /// Returns `None` on an empty sequence.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # use origami::iter::IteratorFoldExt;
-    /// # use origami::wrappers::Product;
-    /// let nums = vec![Product(1), Product(2), Product(3)];
-    /// let product = nums.into_iter().fold_nonempty();
-    /// assert_eq!(product, Some(Product(6)));
-    /// ```
-    fn fold_nonempty(mut self) -> Option<Self::Item>
-        where Self::Item: Semigroup
-    {
-        match self.next() {
-            None => None,
-            Some(first) => Some(self.fold(first, Semigroup::combine)),
-        }
-    }
-
     /// Map each element to a monoid, then combine the results.
     ///
     /// # Example
@@ -60,15 +38,6 @@ pub trait IteratorFoldExt: Iterator + Sized {
         where F: FnMut(Self::Item) -> A, A: Monoid
     {
         self.map(f).fold_monoid()
-    }
-
-    /// Map each element to a semigroup, then combine the results.
-    ///
-    /// Returns `None` on an empty sequence.
-    fn fold_map_nonempty<F, A>(self, f: F) -> Option<A>
-        where F: FnMut(Self::Item) -> A, A: Semigroup
-    {
-        self.map(f).fold_nonempty()
     }
 
     /// Map each element to a reducer, then combine the results.
@@ -87,18 +56,6 @@ pub trait IteratorFoldExt: Iterator + Sized {
         match self.next() {
             None => Monoid::unit(),
             Some(first) => self.fold(Reducer::unit(first), Reducer::combine_right),
-        }
-    }
-
-    /// Map each element to a reducer, then combine the results.
-    ///
-    /// Returns `None` on an empty sequence.
-    fn fold_reduce_nonempty<R>(mut self) -> Option<R>
-        where R: Reducer<Self::Item>
-    {
-        match self.next() {
-            None => None,
-            Some(first) => Some(self.fold(Reducer::unit(first), Reducer::combine_right)),
         }
     }
 }
