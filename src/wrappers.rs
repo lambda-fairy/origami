@@ -1,7 +1,7 @@
 //! Various wrapper types.
 
 use std::cmp;
-use num::{One, Zero};
+use num::{Bounded, One, Zero};
 use std::ops::{Add, Mul};
 
 use super::traits::*;
@@ -67,12 +67,24 @@ impl<T: Ord> Semigroup for Min<T> {
     }
 }
 
+impl<T: Bounded + Ord> Monoid for Min<T> {
+    fn unit() -> Min<T> {
+        Min(Bounded::max_value())
+    }
+}
+
 #[derive(Copy, Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Max<T>(pub T);
 
 impl<T: Ord> Semigroup for Max<T> {
     fn combine(self, other: Max<T>) -> Max<T> {
         Max(cmp::max(self.0, other.0))
+    }
+}
+
+impl<T: Bounded + Ord> Monoid for Max<T> {
+    fn unit() -> Max<T> {
+        Max(Bounded::min_value())
     }
 }
 
