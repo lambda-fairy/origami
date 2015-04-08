@@ -1,5 +1,7 @@
 //! Miscellaneous traits.
 
+use std::borrow::ToOwned;
+
 /// A [semigroup](https://en.wikipedia.org/wiki/Semigroup) is a type
 /// with a combining operation.
 ///
@@ -64,8 +66,8 @@ impl Semigroup for String {
 }
 
 impl<T> Semigroup for Vec<T> {
-    fn combine(mut self, mut other: Vec<T>) -> Vec<T> {
-        self.append(&mut other);
+    fn combine(mut self, other: Vec<T>) -> Vec<T> {
+        self.extend(other.into_iter());
         self
     }
 }
@@ -142,7 +144,7 @@ impl<T> Monoid for Vec<T> {
 /// `String` then fold them up:
 ///
 /// ```ignore
-/// let catenated = words.into_iter().fold_map(String::from_str);
+/// let catenated = words.into_iter().fold_map(ToString::to_string);
 /// ```
 ///
 /// but that allocates too much and runs in quadratic time.
@@ -185,7 +187,7 @@ impl<T, R: Reducer<T>> Reducer<T> for Option<R> {
 
 impl<'a> Reducer<&'a str> for String {
     fn unit(value: &str) -> String {
-        String::from_str(value)
+        value.to_owned()
     }
     fn combine_right(mut self, value: &str) -> String {
         self.push_str(value);
@@ -195,12 +197,10 @@ impl<'a> Reducer<&'a str> for String {
 
 impl<'a, T: Clone> Reducer<&'a [T]> for Vec<T> {
     fn unit(value: &[T]) -> Vec<T> {
-        let mut result = Vec::with_capacity(value.len());
-        result.push_all(value);
-        result
+        value.to_owned()
     }
     fn combine_right(mut self, value: &[T]) -> Vec<T> {
-        self.push_all(value);
+        self.extend(value.iter().cloned());
         self
     }
 }
