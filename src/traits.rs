@@ -1,7 +1,5 @@
 //! Miscellaneous traits.
 
-use std::borrow::ToOwned;
-
 /// A [semigroup](https://en.wikipedia.org/wiki/Semigroup) is a type
 /// with a combining operation.
 ///
@@ -158,36 +156,36 @@ impl<T> Monoid for Vec<T> {
 /// Instead of repeatedly allocating `String`s, the `Reducer` creates a
 /// single `String` and pushes to it using `.combine_right()`.
 pub trait Reducer<T>: Semigroup + Sized {
-    fn unit(value: T) -> Self;
+    fn start(value: T) -> Self;
     fn combine_left(self, value: T) -> Self {
-        <Self as Reducer<T>>::unit(value).combine(self)
+        <Self as Reducer<T>>::start(value).combine(self)
     }
     fn combine_right(self, value: T) -> Self {
-        self.combine(Reducer::unit(value))
+        self.combine(Reducer::start(value))
     }
 }
 
 impl<T, R: Reducer<T>> Reducer<T> for Option<R> {
-    fn unit(value: T) -> Option<R> {
-        Some(Reducer::unit(value))
+    fn start(value: T) -> Option<R> {
+        Some(Reducer::start(value))
     }
     fn combine_left(self, value: T) -> Option<R> {
         match self {
-            None => Some(Reducer::unit(value)),
+            None => Some(Reducer::start(value)),
             Some(r) => Some(r.combine_left(value)),
         }
     }
     fn combine_right(self, value: T) -> Option<R> {
         match self {
-            None => Some(Reducer::unit(value)),
+            None => Some(Reducer::start(value)),
             Some(r) => Some(r.combine_right(value)),
         }
     }
 }
 
 impl<'a> Reducer<&'a str> for String {
-    fn unit(value: &str) -> String {
-        value.to_owned()
+    fn start(value: &str) -> String {
+        String::from(value)
     }
     fn combine_right(mut self, value: &str) -> String {
         self.push_str(value);
@@ -196,8 +194,8 @@ impl<'a> Reducer<&'a str> for String {
 }
 
 impl<'a, T: Clone> Reducer<&'a [T]> for Vec<T> {
-    fn unit(value: &[T]) -> Vec<T> {
-        value.to_owned()
+    fn start(value: &[T]) -> Vec<T> {
+        Vec::from(value)
     }
     fn combine_right(mut self, value: &[T]) -> Vec<T> {
         self.extend(value.iter().cloned());

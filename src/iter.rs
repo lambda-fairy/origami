@@ -17,8 +17,8 @@ pub trait IteratorFoldExt: Iterator + Sized {
     /// let sum = nums.into_iter().fold_monoid();
     /// assert_eq!(sum, Sum(6));
     /// ```
-    fn fold_monoid(self) -> Self::Item
-        where Self::Item: Monoid
+    fn fold_monoid(self) -> Self::Item where
+        Self::Item: Monoid
     {
         self.fold(Monoid::unit(), Semigroup::combine)
     }
@@ -34,8 +34,8 @@ pub trait IteratorFoldExt: Iterator + Sized {
     /// let all_true = nums.into_iter().fold_map(All).0;
     /// assert_eq!(all_true, false);
     /// ```
-    fn fold_map<F, A>(self, f: F) -> A
-        where F: FnMut(Self::Item) -> A, A: Monoid
+    fn fold_map<F, A>(self, f: F) -> A where
+        F: FnMut(Self::Item) -> A, A: Monoid
     {
         self.map(f).fold_monoid()
     }
@@ -50,12 +50,12 @@ pub trait IteratorFoldExt: Iterator + Sized {
     /// let result = names.into_iter().fold_reduce::<String>();
     /// assert_eq!(result, "ApplejackFluttershyRarity");
     /// ```
-    fn fold_reduce<R>(mut self) -> R
-        where R: Reducer<Self::Item> + Monoid
+    fn fold_reduce<R>(mut self) -> R where
+        R: Reducer<Self::Item> + Monoid
     {
         match self.next() {
             None => Monoid::unit(),
-            Some(first) => self.fold(Reducer::unit(first), Reducer::combine_right),
+            Some(first) => self.fold(Reducer::start(first), Reducer::combine_right),
         }
     }
 }
