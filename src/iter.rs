@@ -1,6 +1,6 @@
 //! Iterator adaptors.
 
-use super::traits::*;
+use traits::*;
 
 /// Extends the `Iterator` trait with origami superpowers.
 pub trait IteratorFoldExt: Iterator + Sized {

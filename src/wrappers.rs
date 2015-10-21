@@ -4,7 +4,7 @@ use std::cmp;
 use num::{Bounded, One, Zero};
 use std::ops::{Add, Mul};
 
-use super::traits::*;
+use traits::*;
 
 #[derive(Copy, Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct Product<T>(pub T);
